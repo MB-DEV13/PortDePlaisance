@@ -21,6 +21,14 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Connexion à MongoDB réussie"))
   .catch((err) => console.error("❌ Erreur de connexion MongoDB", err));
+mongoose.connection.on("connected", () => {
+  console.log("🌿 Connecté à la base MongoDB:", mongoose.connection.name);
+});
+
+// **Import des routes**
+const catwaysRouter = require("./routes/Catways");
+// **Utilisation des routes**
+app.use("/catways", catwaysRouter);
 
 // Route d'accueil
 app.get("/", (req, res) => {
