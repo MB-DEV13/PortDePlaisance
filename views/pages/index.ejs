@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <h1>Bienvenue au Port de Plaisance de Russell</h1>
+    <form action="/login" method="POST">
+      <input type="email" name="email" placeholder="Email" required />
+      <input
+        type="password"
+        name="password"
+        placeholder="Mot de passe"
+        required
+      />
+      <button type="submit">Se connecter</button>
+    </form>
+  </body>
+</html>
