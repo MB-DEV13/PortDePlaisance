@@ -25,15 +25,17 @@ mongoose.connection.on("connected", () => {
   console.log("🌿 Connecté à la base MongoDB:", mongoose.connection.name);
 });
 
-// **Import des routes**
+// Import des routes
 const catwaysRouter = require("./routes/Catways");
 const reservationsRouter = require("./routes/Reservations");
+const usersRouter = require("./routes/Users");
+const authRouter = require("./routes/Auth");
 
-// **Utilisation des routes**
+// Utilisation des routes
 app.use("/catways", catwaysRouter);
-
-// Sous-route réservations imbriquée dans catways/:id
 app.use("/catways/:id/reservations", reservationsRouter);
+app.use("/users", usersRouter);
+app.use("/", authRouter);
 
 // Route d'accueil
 app.get("/", (req, res) => {
