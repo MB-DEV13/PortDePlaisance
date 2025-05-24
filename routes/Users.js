@@ -2,7 +2,7 @@ const express = require("express");
 const { body, validationResult, param } = require("express-validator");
 const router = express.Router();
 const User = require("../models/User");
-const authMiddleware = require("../middleware/auth");
+const authMiddleware = require("../middlewares/auth");
 
 // Appliquer l'authentification à toutes les routes sauf POST /users (création utilisateur)
 router.use((req, res, next) => {

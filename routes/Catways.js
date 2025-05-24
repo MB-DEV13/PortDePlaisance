@@ -2,7 +2,7 @@ const express = require("express");
 const { body, validationResult, param } = require("express-validator");
 const router = express.Router();
 const Catway = require("../models/Catway");
-const authMiddleware = require("../middleware/auth");
+const authMiddleware = require("../middlewares/auth");
 
 // Appliquer auth à toutes les routes catways
 router.use(authMiddleware);

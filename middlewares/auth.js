@@ -1,10 +1,8 @@
 const jwt = require("jsonwebtoken");
 
 module.exports = function (req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: "Token manquant" });
+  const token = req.cookies.token; // récupère le token dans le cookie
 
-  const token = authHeader.split(" ")[1]; // Authorization: Bearer <token>
   if (!token) return res.status(401).json({ message: "Token manquant" });
 
   try {
