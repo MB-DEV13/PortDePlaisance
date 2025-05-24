@@ -27,8 +27,13 @@ mongoose.connection.on("connected", () => {
 
 // **Import des routes**
 const catwaysRouter = require("./routes/Catways");
+const reservationsRouter = require("./routes/Reservations");
+
 // **Utilisation des routes**
 app.use("/catways", catwaysRouter);
+
+// Sous-route réservations imbriquée dans catways/:id
+app.use("/catways/:id/reservations", reservationsRouter);
 
 // Route d'accueil
 app.get("/", (req, res) => {
