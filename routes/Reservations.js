@@ -3,7 +3,7 @@ const { body, validationResult } = require("express-validator");
 const router = express.Router({ mergeParams: true }); // pour récupérer :id catway
 const Reservation = require("../models/Reservation");
 const Catway = require("../models/Catway");
-const authMiddleware = require("../middleware/auth"); // middleware d'authentification
+const authMiddleware = require("../middlewares/auth"); // middleware d'authentification
 
 // Appliquer auth à toutes les routes
 router.use(authMiddleware);

@@ -8,7 +8,11 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 // Import du middleware d'authentification
-const authMiddleware = require("./middlewares/authMiddleware");
+const authMiddleware = require("./middlewares/auth");
+
+// Import des modèles nécessaires
+const User = require("./models/User");
+const Reservation = require("./models/Reservation"); // adapte si besoin
 
 // Configurations
 app.set("view engine", "ejs");
@@ -19,7 +23,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser()); // Pour gérer les cookies
+app.use(cookieParser());
 
 // Connexion MongoDB
 mongoose
@@ -47,9 +51,24 @@ app.get("/", (req, res) => {
   res.render("index", { error: null });
 });
 
-// Route dashboard protégée
-app.get("/dashboard", authMiddleware, (req, res) => {
-  res.render("dashboard", { user: req.user });
+// Route dashboard protégée avec récupération des données
+app.get("/dashboard", authMiddleware, async (req, res) => {
+  try {
+    // Récupérer l'utilisateur complet sans le password
+    const user = await User.findById(req.user.userId).select("-password");
+    if (!user) {
+      return res.status(404).send("Utilisateur non trouvé");
+    }
+
+    // Récupérer les réservations (ajuste selon ton schéma)
+    const reservations = await Reservation.find();
+
+    // Rendre la page dashboard en passant les données
+    res.render("dashboard", { user, reservations });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Erreur serveur");
+  }
 });
 
 // Lancer le serveur

@@ -32,15 +32,23 @@ router.post(
           .json({ message: "Email ou mot de passe incorrect" });
       }
 
-      // Générer un token JWT (validité 1h par exemple)
+      // Générer un token JWT (validité 1h)
       const token = jwt.sign(
         { userId: user._id, email: user.email, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
 
+      // Stocker le token dans un cookie HTTPOnly (et Secure en prod)
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // en prod seulement
+        sameSite: "strict",
+        maxAge: 3600000, // 1h en ms
+      });
+
       res.json({
-        token,
+        message: "Connexion réussie",
         user: { email: user.email, name: user.name, role: user.role },
       });
     } catch (error) {
@@ -49,14 +57,10 @@ router.post(
   }
 );
 
-// GET /logout - dans JWT, logout côté client suffit, mais on peut "simuler" la déconnexion côté serveur
 router.get("/logout", (req, res) => {
-  // Avec JWT, la "déconnexion" se fait côté client en supprimant le token.
-  // Ici juste un message pour informer.
-  res.json({
-    message:
-      "Déconnexion réussie côté serveur. Pensez à supprimer le token côté client.",
-  });
+  // Supprimer le cookie token côté serveur
+  res.clearCookie("token");
+  res.json({ message: "Déconnexion réussie" });
 });
 
 module.exports = router;
