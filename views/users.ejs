@@ -1,0 +1,131 @@
+<body class="d-flex flex-column min-vh-100">
+  <main class="flex-grow-1">
+    <%- include('partials/header', { title: 'Gestion des Utilisateurs' }) %>
+
+    <div class="container mt-4">
+      <h1>Gestion des Utilisateurs</h1>
+
+      <!-- Formulaire d'ajout -->
+      <form id="add-user-form" class="mb-4">
+        <div class="mb-3">
+          <label for="user-name" class="form-label">Nom</label>
+          <input type="text" class="form-control" id="user-name" required />
+        </div>
+        <div class="mb-3">
+          <label for="user-email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="user-email" required />
+        </div>
+        <div class="mb-3">
+          <label for="user-password" class="form-label">Mot de passe</label>
+          <input
+            type="password"
+            class="form-control"
+            id="user-password"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+      </form>
+
+      <!-- Liste des utilisateurs -->
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="users-list">
+          <% users.forEach(u => { %>
+          <tr data-id="<%= u._id %>">
+            <td><%= u.name %></td>
+            <td><%= u.email %></td>
+            <td>
+              <button class="btn btn-sm btn-warning btn-edit">Modifier</button>
+              <button class="btn btn-sm btn-danger btn-delete">
+                Supprimer
+              </button>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      const usersList = document.getElementById("users-list");
+      const addForm = document.getElementById("add-user-form");
+
+      // Ajouter un utilisateur
+      addForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("user-name").value.trim();
+        const email = document.getElementById("user-email").value.trim();
+        const password = document.getElementById("user-password").value;
+
+        if (!name || !email || !password) {
+          return alert("Tous les champs sont obligatoires");
+        }
+
+        try {
+          const res = await fetch("/users", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password }),
+          });
+          if (!res.ok) throw new Error("Erreur ajout");
+          location.reload();
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+
+      // Supprimer un utilisateur
+      usersList.addEventListener("click", async (e) => {
+        if (!e.target.classList.contains("btn-delete")) return;
+        const tr = e.target.closest("tr");
+        const id = tr.dataset.id;
+        if (!confirm("Supprimer cet utilisateur ?")) return;
+        try {
+          const res = await fetch("/users/" + id, { method: "DELETE" });
+          if (!res.ok) throw new Error("Erreur suppression");
+          location.reload();
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+
+      // Modifier un utilisateur (prompt simple)
+      usersList.addEventListener("click", async (e) => {
+        if (!e.target.classList.contains("btn-edit")) return;
+        const tr = e.target.closest("tr");
+        const id = tr.dataset.id;
+        const currentName = tr.children[0].textContent;
+        const currentEmail = tr.children[1].textContent;
+
+        const newName = prompt("Nouveau nom", currentName);
+        if (!newName) return;
+        const newEmail = prompt("Nouvel email", currentEmail);
+        if (!newEmail) return;
+
+        try {
+          const res = await fetch("/users/" + id, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: newName.trim(),
+              email: newEmail.trim(),
+            }),
+          });
+          if (!res.ok) throw new Error("Erreur modification");
+          location.reload();
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+    </script>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
