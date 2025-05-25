@@ -4,7 +4,22 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 
-// POST /login - authentification utilisateur et génération du token JWT
+/**
+ * Authentifie un utilisateur à partir de son email et mot de passe.
+ * @route POST /login
+ * @group Authentification
+ * @param {string} email.body.required - L'adresse email de l'utilisateur
+ * @param {string} password.body.required - Le mot de passe de l'utilisateur
+ * @returns {object} 200 - Un message de succès et les informations de l'utilisateur
+ * @returns {object} 400 - Erreurs de validation du formulaire
+ * @returns {object} 401 - Identifiants invalides
+ * @returns {object} 500 - Erreur serveur
+ * @example request - Exemple de body
+ * {
+ *   "email": "admin@port.com",
+ *   "password": "motdepasse"
+ * }
+ */
 router.post(
   "/login",
   [
@@ -32,19 +47,17 @@ router.post(
           .json({ message: "Email ou mot de passe incorrect" });
       }
 
-      // Générer un token JWT (validité 1h)
       const token = jwt.sign(
         { userId: user._id, email: user.email, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
 
-      // Stocker le token dans un cookie HTTPOnly (et Secure en prod)
       res.cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // en prod seulement
+        secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 3600000, // 1h en ms
+        maxAge: 3600000,
       });
 
       res.json({
@@ -57,8 +70,13 @@ router.post(
   }
 );
 
+/**
+ * Déconnecte l'utilisateur en supprimant le cookie contenant le token JWT.
+ * @route GET /logout
+ * @group Authentification
+ * @returns {object} 200 - Message de déconnexion réussie
+ */
 router.get("/logout", (req, res) => {
-  // Supprimer le cookie token côté serveur
   res.clearCookie("token");
   res.json({ message: "Déconnexion réussie" });
 });

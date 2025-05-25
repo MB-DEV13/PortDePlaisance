@@ -57,7 +57,9 @@
       const usersList = document.getElementById("users-list");
       const addForm = document.getElementById("add-user-form");
 
-      // Ajouter un utilisateur
+      /**
+       * Ajouter un utilisateur
+       */
       addForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const name = document.getElementById("user-name").value.trim();
@@ -81,7 +83,9 @@
         }
       });
 
-      // Supprimer un utilisateur
+      /**
+       * Supprimer un utilisateur
+       */
       usersList.addEventListener("click", async (e) => {
         if (!e.target.classList.contains("btn-delete")) return;
         const tr = e.target.closest("tr");
@@ -96,7 +100,9 @@
         }
       });
 
-      // Modifier un utilisateur (prompt simple)
+      /**
+       * Modifier un utilisateur (prompt simple)
+       */
       usersList.addEventListener("click", async (e) => {
         if (!e.target.classList.contains("btn-edit")) return;
         const tr = e.target.closest("tr");

@@ -62,7 +62,9 @@
   const reservationsList = document.getElementById("reservations-list");
   const addForm = document.getElementById("add-reservation-form");
 
-  // Ajouter une réservation
+  /**
+   * Ajouter une réservation
+   */
   addForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const catwayNumber = document.getElementById("catway-number").value.trim();
@@ -98,7 +100,9 @@
     }
   });
 
-  // Supprimer une réservation
+  /**
+   * Supprimer une réservation
+   */
   reservationsList.addEventListener("click", async (e) => {
     if (!e.target.classList.contains("btn-delete")) return;
     const tr = e.target.closest("tr");
@@ -113,7 +117,9 @@
     }
   });
 
-  // Modifier une réservation (prompt simple pour exemple)
+  /**
+   * Modifier une réservation (prompt simple pour exemple)
+   */
   reservationsList.addEventListener("click", async (e) => {
     if (!e.target.classList.contains("btn-edit")) return;
     const tr = e.target.closest("tr");
