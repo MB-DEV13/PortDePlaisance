@@ -3,27 +3,40 @@ const router = express.Router();
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
-// GET /users — afficher tous les utilisateurs
+/**
+ * Affiche tous les utilisateurs (hors mot de passe).
+ * @route GET /users
+ * @group Utilisateurs
+ * @returns {HTML} 200 - Page HTML contenant la liste des utilisateurs
+ * @returns {Error} 500 - Erreur serveur
+ */
 router.get("/", async (req, res) => {
   try {
-    const users = await User.find().select("-password"); // ne pas envoyer le mot de passe
+    const users = await User.find().select("-password");
     res.render("users", { users });
   } catch (err) {
     res.status(500).send("Erreur serveur");
   }
 });
 
-// POST /users — créer un utilisateur
+/**
+ * Crée un nouvel utilisateur.
+ * @route POST /users
+ * @group Utilisateurs
+ * @param {string} name.body.required - Nom de l'utilisateur
+ * @param {string} email.body.required - Email de l'utilisateur (doit être unique)
+ * @param {string} password.body.required - Mot de passe à hasher
+ * @returns {object} 201 - Utilisateur créé (hors mot de passe)
+ * @returns {Error} 400 - Erreur de validation ou email déjà utilisé
+ */
 router.post("/", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Vérifier si l'utilisateur existe déjà
     const userExists = await User.findOne({ email });
     if (userExists)
       return res.status(400).json({ error: "Email déjà utilisé" });
 
-    // Hasher le mot de passe
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
@@ -41,7 +54,17 @@ router.post("/", async (req, res) => {
   }
 });
 
-// PUT /users/:id — modifier un utilisateur (sans modifier mot de passe ici)
+/**
+ * Met à jour un utilisateur (hors mot de passe).
+ * @route PUT /users/{id}
+ * @group Utilisateurs
+ * @param {string} id.path.required - ID de l'utilisateur
+ * @param {string} name.body.required - Nouveau nom
+ * @param {string} email.body.required - Nouvel email
+ * @returns {object} 200 - Utilisateur mis à jour
+ * @returns {Error} 400 - Erreur de validation
+ * @returns {Error} 404 - Utilisateur non trouvé
+ */
 router.put("/:id", async (req, res) => {
   try {
     const { name, email } = req.body;
@@ -58,7 +81,15 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE /users/:id — supprimer un utilisateur
+/**
+ * Supprime un utilisateur par ID.
+ * @route DELETE /users/{id}
+ * @group Utilisateurs
+ * @param {string} id.path.required - ID de l'utilisateur à supprimer
+ * @returns {object} 200 - Message de confirmation
+ * @returns {Error} 404 - Utilisateur non trouvé
+ * @returns {Error} 500 - Erreur serveur
+ */
 router.delete("/:id", async (req, res) => {
   try {
     const deleted = await User.findByIdAndDelete(req.params.id);

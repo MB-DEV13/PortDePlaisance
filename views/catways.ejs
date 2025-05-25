@@ -61,7 +61,12 @@
   const catwaysList = document.getElementById("catways-list");
   const addForm = document.getElementById("add-catway-form");
 
-  // Ajouter un catway
+  /**
+   * Gestionnaire d'événement pour l'ajout d'un nouveau catway.
+   * Envoie une requête POST vers /catways avec les données du formulaire.
+   * @param {Event} e - L'événement submit du formulaire.
+   * @returns {Promise<void>}
+   */
   addForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const catwayNumber = parseInt(
@@ -90,7 +95,13 @@
     }
   });
 
-  // Supprimer un catway
+  /**
+   * Gestionnaire d'événement pour la suppression d'un catway.
+   * Écoute les clics sur les boutons de suppression dans la liste.
+   * Envoie une requête DELETE vers /catways/:catwayNumber.
+   * @param {MouseEvent} e - L'événement click.
+   * @returns {Promise<void>}
+   */
   catwaysList.addEventListener("click", async (e) => {
     if (!e.target.classList.contains("btn-delete")) return;
     const tr = e.target.closest("tr");
@@ -108,7 +119,12 @@
     }
   });
 
-  // Modifier l'état d'un catway (prompt)
+  /**
+   * Gestionnaire d'événement pour modifier l'état d'un catway.
+   * Affiche un prompt pour saisir le nouvel état, puis envoie une requête PUT vers /catways/:catwayNumber.
+   * @param {MouseEvent} e - L'événement click.
+   * @returns {Promise<void>}
+   */
   catwaysList.addEventListener("click", async (e) => {
     if (!e.target.classList.contains("btn-edit")) return;
     const tr = e.target.closest("tr");

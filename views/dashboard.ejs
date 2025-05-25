@@ -10,6 +10,12 @@
     />
   </head>
   <body class="d-flex flex-column min-vh-100">
+    <% /** * Page Tableau de bord utilisateur. * Affiche un résumé des
+    informations de l'utilisateur connecté, * ainsi que la liste des
+    réservations en cours. * Contient aussi la navigation principale avec accès
+    aux * différentes sections (catways, réservations, utilisateurs, API docs).
+    */ %>
+
     <main class="flex-grow-1">
       <div class="page-container d-flex flex-column">
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -40,7 +46,7 @@
                   <a class="nav-link" href="/users">Gestion des utilisateurs</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="/api-docs" target="_blank"
+                  <a class="nav-link" href="/docs/api.md" target="_blank"
                     >Documentation API</a
                   >
                 </li>
@@ -95,6 +101,13 @@
 
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
       <script>
+        /**
+         * Gestionnaire d'événement du lien "Se déconnecter".
+         * Envoie une requête GET vers /logout pour terminer la session,
+         * puis redirige vers la page d'accueil.
+         * @param {MouseEvent} e - L'événement click sur le lien.
+         * @returns {Promise<void>}
+         */
         document
           .getElementById("logout-link")
           .addEventListener("click", async (e) => {

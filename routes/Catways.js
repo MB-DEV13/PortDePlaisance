@@ -7,7 +7,13 @@ const authMiddleware = require("../middlewares/auth");
 // Appliquer auth à toutes les routes catways
 router.use(authMiddleware);
 
-// GET /catways - Rendre la page EJS avec la liste des catways
+/**
+ * Affiche la page EJS avec la liste des catways.
+ * @route GET /catways
+ * @group Catways
+ * @returns {HTML} 200 - Page HTML rendue avec la liste des catways
+ * @returns {Error} 500 - Erreur serveur
+ */
 router.get("/", async (req, res) => {
   try {
     const catways = await Catway.find();
@@ -17,7 +23,16 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /catways/:id - Récupérer un catway par son numéro (JSON API)
+/**
+ * Récupère un catway par son numéro.
+ * @route GET /catways/{id}
+ * @group Catways
+ * @param {number} id.path.required - Numéro du catway
+ * @returns {object} 200 - Objet catway
+ * @returns {Error} 400 - ID invalide
+ * @returns {Error} 404 - Catway non trouvé
+ * @returns {Error} 500 - Erreur serveur
+ */
 router.get(
   "/:id",
   param("id").isInt({ min: 1 }).withMessage("L'id doit être un entier positif"),
@@ -40,7 +55,17 @@ router.get(
   }
 );
 
-// POST /catways - Créer un nouveau catway (API JSON)
+/**
+ * Crée un nouveau catway.
+ * @route POST /catways
+ * @group Catways
+ * @param {integer} catwayNumber.body.required - Numéro du catway
+ * @param {string} catwayType.body.required - Type du catway (long, short)
+ * @param {string} catwayState.body.required - État du catway
+ * @returns {object} 201 - Objet catway créé
+ * @returns {Error} 400 - Données invalides ou numéro déjà existant
+ * @returns {Error} 500 - Erreur serveur
+ */
 router.post(
   "/",
   [
@@ -83,7 +108,17 @@ router.post(
   }
 );
 
-// PUT /catways/:id - Modifier uniquement l'état du catway (API JSON)
+/**
+ * Met à jour l'état d’un catway existant.
+ * @route PUT /catways/{id}
+ * @group Catways
+ * @param {number} id.path.required - Numéro du catway à modifier
+ * @param {string} catwayState.body.required - Nouvel état du catway
+ * @returns {object} 200 - Catway mis à jour
+ * @returns {Error} 400 - Données invalides
+ * @returns {Error} 404 - Catway non trouvé
+ * @returns {Error} 500 - Erreur serveur
+ */
 router.put(
   "/:id",
   [
@@ -124,7 +159,16 @@ router.put(
   }
 );
 
-// DELETE /catways/:id - Supprimer un catway (API JSON)
+/**
+ * Supprime un catway.
+ * @route DELETE /catways/{id}
+ * @group Catways
+ * @param {number} id.path.required - Numéro du catway à supprimer
+ * @returns {object} 200 - Message de confirmation
+ * @returns {Error} 400 - ID invalide
+ * @returns {Error} 404 - Catway non trouvé
+ * @returns {Error} 500 - Erreur serveur
+ */
 router.delete(
   "/:id",
   param("id").isInt({ min: 1 }).withMessage("L'id doit être un entier positif"),
