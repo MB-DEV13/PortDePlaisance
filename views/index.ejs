@@ -8,99 +8,104 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/index.css" />
   </head>
-  <body>
-    <div class="container mt-5">
-      <h1 class="mb-4">
-        Bienvenue sur le panel du Port de Plaisance de Russell
-      </h1>
+  <body class="d-flex flex-column min-vh-100">
+    <main class="flex-grow-1">
+      <div class="container mt-5">
+        <h1 class="mb-4">
+          Bienvenue sur le panel du Port de Plaisance de Russell
+        </h1>
 
-      <p class="lead">
-        Cette application vous permet de gérer facilement les réservations de
-        catways, les utilisateurs et plus encore.<br /><br />
-        Connectez-vous pour accéder à votre tableau de bord.
-      </p>
+        <p class="lead">
+          Cette application vous permet de gérer facilement les réservations de
+          catways, les utilisateurs et plus encore.<br /><br />
+          Connectez-vous pour accéder à votre tableau de bord.
+        </p>
 
-      <div id="error-message" class="alert alert-danger d-none"></div>
+        <div id="error-message" class="alert alert-danger d-none"></div>
 
-      <form id="login-form" class="mb-4" style="max-width: 400px">
-        <div class="mb-3">
-          <label for="email" class="form-label">Adresse email</label>
-          <input
-            type="email"
-            class="form-control"
-            id="email"
-            name="email"
-            placeholder="exemple@domaine.com"
-            required
-            autofocus
-          />
-        </div>
-        <div class="mb-3">
-          <label for="password" class="form-label">Mot de passe</label>
-          <input
-            type="password"
-            class="form-control"
-            id="password"
-            name="password"
-            placeholder="Votre mot de passe"
-            required
-          />
-        </div>
-        <button type="submit" class="btn btn-primary">Se connecter</button>
-      </form>
+        <form id="login-form" class="mb-4 mt-5">
+          <div class="mb-3">
+            <label for="email" class="form-label">Adresse email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              name="email"
+              placeholder="exemple@domaine.com"
+              required
+              autofocus
+            />
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Mot de passe</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              placeholder="Votre mot de passe"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Se connecter</button>
+        </form>
 
-      <p>
-        <a href="/api-docs" target="_blank"
-          >Voir la documentation complète de l'API</a
-        >
-      </p>
-    </div>
+        <p>
+          <a href="/api-docs" target="_blank"
+            >Voir la documentation complète de l'API</a
+          >
+        </p>
+      </div>
 
-    <script>
-      const form = document.getElementById("login-form");
-      const errorMessage = document.getElementById("error-message");
+      <script>
+        const form = document.getElementById("login-form");
+        const errorMessage = document.getElementById("error-message");
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-        errorMessage.classList.add("d-none");
-        errorMessage.textContent = "";
+          errorMessage.classList.add("d-none");
+          errorMessage.textContent = "";
 
-        const email = form.email.value.trim();
-        const password = form.password.value;
+          const email = form.email.value.trim();
+          const password = form.password.value;
 
-        try {
-          const response = await fetch("/login", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
-            credentials: "same-origin", // IMPORTANT pour envoyer/recevoir cookies
-          });
+          try {
+            const response = await fetch("/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ email, password }),
+              credentials: "same-origin", // IMPORTANT pour envoyer/recevoir cookies
+            });
 
-          if (!response.ok) {
-            const data = await response.json();
-            errorMessage.textContent =
-              data.message ||
-              (data.errors && data.errors[0].msg) ||
-              "Erreur inconnue";
+            if (!response.ok) {
+              const data = await response.json();
+              errorMessage.textContent =
+                data.message ||
+                (data.errors && data.errors[0].msg) ||
+                "Erreur inconnue";
+              errorMessage.classList.remove("d-none");
+              return;
+            }
+
+            // Pas besoin de stocker le token côté client, c'est dans le cookie HTTPOnly
+
+            // Rediriger vers dashboard
+            window.location.href = "/dashboard";
+          } catch (err) {
+            errorMessage.textContent = "Erreur réseau, réessayez.";
             errorMessage.classList.remove("d-none");
-            return;
           }
+        });
+      </script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </main>
 
-          // Pas besoin de stocker le token côté client, c'est dans le cookie HTTPOnly
-
-          // Rediriger vers dashboard
-          window.location.href = "/dashboard";
-        } catch (err) {
-          errorMessage.textContent = "Erreur réseau, réessayez.";
-          errorMessage.classList.remove("d-none");
-        }
-      });
-    </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <%- include('partials/footer') %>
   </body>
 </html>
