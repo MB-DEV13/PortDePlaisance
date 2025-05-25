@@ -7,17 +7,17 @@ const authMiddleware = require("../middlewares/auth");
 // Appliquer auth à toutes les routes catways
 router.use(authMiddleware);
 
-// GET /catways - Liste tous les catways
+// GET /catways - Rendre la page EJS avec la liste des catways
 router.get("/", async (req, res) => {
   try {
     const catways = await Catway.find();
-    res.json(catways);
+    res.render("catways", { catways, title: "Gestion des Catways" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).send("Erreur serveur");
   }
 });
 
-// GET /catways/:id - Récupérer un catway par son numéro
+// GET /catways/:id - Récupérer un catway par son numéro (JSON API)
 router.get(
   "/:id",
   param("id").isInt({ min: 1 }).withMessage("L'id doit être un entier positif"),
@@ -40,7 +40,7 @@ router.get(
   }
 );
 
-// POST /catways - Créer un nouveau catway
+// POST /catways - Créer un nouveau catway (API JSON)
 router.post(
   "/",
   [
@@ -60,7 +60,6 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
 
     try {
-      // Vérifier unicité du numéro
       const exists = await Catway.findOne({
         catwayNumber: req.body.catwayNumber,
       });
@@ -84,7 +83,7 @@ router.post(
   }
 );
 
-// PUT /catways/:id - Modifier uniquement l'état du catway (numéro et type non modifiables)
+// PUT /catways/:id - Modifier uniquement l'état du catway (API JSON)
 router.put(
   "/:id",
   [
@@ -125,7 +124,7 @@ router.put(
   }
 );
 
-// DELETE /catways/:id - Supprimer un catway
+// DELETE /catways/:id - Supprimer un catway (API JSON)
 router.delete(
   "/:id",
   param("id").isInt({ min: 1 }).withMessage("L'id doit être un entier positif"),
