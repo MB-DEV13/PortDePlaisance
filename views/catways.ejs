@@ -1,0 +1,136 @@
+<%- include('partials/header', { title: 'Gestion des Catways' }) %>
+
+<div class="container mt-4">
+  <h1>Gestion des Catways</h1>
+
+  <!-- Formulaire d'ajout -->
+  <form id="add-catway-form" class="mb-4">
+    <div class="mb-3">
+      <label for="catway-number" class="form-label">Numéro du Catway</label>
+      <input
+        type="number"
+        class="form-control"
+        id="catway-number"
+        required
+        min="1"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="catway-type" class="form-label">Type de Catway</label>
+      <select id="catway-type" class="form-select" required>
+        <option value="">-- Choisir un type --</option>
+        <option value="short">Short</option>
+        <option value="long">Long</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="catway-state" class="form-label">État du Catway</label>
+      <input type="text" class="form-control" id="catway-state" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Ajouter</button>
+  </form>
+
+  <!-- Liste des catways -->
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Numéro</th>
+        <th>Type</th>
+        <th>État</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="catways-list">
+      <% catways.forEach(catway => { %>
+      <tr data-id="<%= catway.catwayNumber %>">
+        <td><%= catway.catwayNumber %></td>
+        <td><%= catway.catwayType %></td>
+        <td><%= catway.catwayState %></td>
+        <td>
+          <!-- Pour la modif, ici on ne permet que la modif de l'état -->
+          <button class="btn btn-sm btn-warning btn-edit">Modifier État</button>
+          <button class="btn btn-sm btn-danger btn-delete">Supprimer</button>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  const catwaysList = document.getElementById("catways-list");
+  const addForm = document.getElementById("add-catway-form");
+
+  // Ajouter un catway
+  addForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const catwayNumber = parseInt(
+      document.getElementById("catway-number").value.trim()
+    );
+    const catwayType = document.getElementById("catway-type").value;
+    const catwayState = document.getElementById("catway-state").value.trim();
+
+    if (!catwayNumber || !catwayType || !catwayState) {
+      return alert("Tous les champs sont requis");
+    }
+
+    try {
+      const res = await fetch("/catways", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ catwayNumber, catwayType, catwayState }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Erreur ajout");
+      }
+      location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // Supprimer un catway
+  catwaysList.addEventListener("click", async (e) => {
+    if (!e.target.classList.contains("btn-delete")) return;
+    const tr = e.target.closest("tr");
+    const catwayNumber = tr.dataset.id;
+    if (!confirm("Supprimer ce catway ?")) return;
+    try {
+      const res = await fetch("/catways/" + catwayNumber, { method: "DELETE" });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Erreur suppression");
+      }
+      location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // Modifier l'état d'un catway (prompt)
+  catwaysList.addEventListener("click", async (e) => {
+    if (!e.target.classList.contains("btn-edit")) return;
+    const tr = e.target.closest("tr");
+    const catwayNumber = tr.dataset.id;
+    const currentState = tr.querySelector("td:nth-child(3)").textContent;
+    const newState = prompt("Nouvel état du catway", currentState);
+    if (!newState || newState.trim() === currentState) return;
+    try {
+      const res = await fetch("/catways/" + catwayNumber, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ catwayState: newState.trim() }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Erreur modification");
+      }
+      location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+</script>
+
+<%- include('partials/footer') %>
