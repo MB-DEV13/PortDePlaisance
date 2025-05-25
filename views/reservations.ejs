@@ -1,0 +1,169 @@
+<%- include('partials/header', { title: 'Gestion des Réservations' }) %>
+
+<div class="container mt-4">
+  <h1>Gestion des Réservations</h1>
+
+  <!-- Formulaire d'ajout -->
+  <form id="add-reservation-form" class="mb-4">
+    <div class="mb-3">
+      <label for="catway-number" class="form-label">Numéro du Catway</label>
+      <input type="text" class="form-control" id="catway-number" required />
+    </div>
+    <div class="mb-3">
+      <label for="client-name" class="form-label">Nom du client</label>
+      <input type="text" class="form-control" id="client-name" required />
+    </div>
+    <div class="mb-3">
+      <label for="boat-name" class="form-label">Nom du bateau</label>
+      <input type="text" class="form-control" id="boat-name" required />
+    </div>
+    <div class="mb-3">
+      <label for="start-date" class="form-label">Date début</label>
+      <input type="date" class="form-control" id="start-date" required />
+    </div>
+    <div class="mb-3">
+      <label for="end-date" class="form-label">Date fin</label>
+      <input type="date" class="form-control" id="end-date" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Ajouter</button>
+  </form>
+
+  <!-- Liste des réservations -->
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Catway numéro</th>
+        <th>Nom du client</th>
+        <th>Nom du bateau</th>
+        <th>Date début</th>
+        <th>Date fin</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="reservations-list">
+      <% reservations.forEach(r => { %>
+      <tr data-id="<%= r._id %>">
+        <td><%= r.catwayNumber %></td>
+        <td><%= r.clientName %></td>
+        <td><%= r.boatName %></td>
+        <td><%= new Date(r.startDate).toLocaleDateString('fr-FR') %></td>
+        <td><%= new Date(r.endDate).toLocaleDateString('fr-FR') %></td>
+        <td>
+          <button class="btn btn-sm btn-warning btn-edit">Modifier</button>
+          <button class="btn btn-sm btn-danger btn-delete">Supprimer</button>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  const reservationsList = document.getElementById("reservations-list");
+  const addForm = document.getElementById("add-reservation-form");
+
+  // Ajouter une réservation
+  addForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const catwayNumber = document.getElementById("catway-number").value.trim();
+    const clientName = document.getElementById("client-name").value.trim();
+    const boatName = document.getElementById("boat-name").value.trim();
+    const startDate = document.getElementById("start-date").value;
+    const endDate = document.getElementById("end-date").value;
+
+    if (!catwayNumber || !clientName || !boatName || !startDate || !endDate) {
+      return alert("Tous les champs sont obligatoires");
+    }
+
+    try {
+      const res = await fetch("/reservations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          catwayNumber,
+          clientName,
+          boatName,
+          startDate,
+          endDate,
+        }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Erreur API:", errorData);
+        throw new Error(errorData.error || "Erreur ajout");
+      }
+      location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // Supprimer une réservation
+  reservationsList.addEventListener("click", async (e) => {
+    if (!e.target.classList.contains("btn-delete")) return;
+    const tr = e.target.closest("tr");
+    const id = tr.dataset.id;
+    if (!confirm("Supprimer cette réservation ?")) return;
+    try {
+      const res = await fetch("/reservations/" + id, { method: "DELETE" });
+      if (!res.ok) throw new Error("Erreur suppression");
+      location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+
+  // Modifier une réservation (prompt simple pour exemple)
+  reservationsList.addEventListener("click", async (e) => {
+    if (!e.target.classList.contains("btn-edit")) return;
+    const tr = e.target.closest("tr");
+    const id = tr.dataset.id;
+
+    // Prompt les champs un par un (simplification)
+    const catwayNumber = prompt(
+      "Nouveau numéro du catway",
+      tr.children[0].textContent
+    );
+    if (!catwayNumber) return;
+    const clientName = prompt(
+      "Nouveau nom du client",
+      tr.children[1].textContent
+    );
+    if (!clientName) return;
+    const boatName = prompt(
+      "Nouveau nom du bateau",
+      tr.children[2].textContent
+    );
+    if (!boatName) return;
+    const startDate = prompt(
+      "Nouvelle date début (YYYY-MM-DD)",
+      new Date(tr.children[3].textContent).toISOString().slice(0, 10)
+    );
+    if (!startDate) return;
+    const endDate = prompt(
+      "Nouvelle date fin (YYYY-MM-DD)",
+      new Date(tr.children[4].textContent).toISOString().slice(0, 10)
+    );
+    if (!endDate) return;
+
+    try {
+      const res = await fetch("/reservations/" + id, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          catwayNumber,
+          clientName,
+          boatName,
+          startDate,
+          endDate,
+        }),
+      });
+      if (!res.ok) throw new Error("Erreur modification");
+      location.reload();
+    } catch (err) {
+      alert(err.message);
+    }
+  });
+</script>
+
+<%- include('partials/footer') %>
